@@ -1,9 +1,9 @@
-const User = require('../models/userModel');
+// const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db'); // Import the database connection
 const { json, response } = require('express');
-const { LoginResponse } = require('../models/login/Response');
-const { successCode, successMsg, failureCode, failureMsg } = require('../config/constants');
+const { LoginResponse } = require('../utilities/Response');
+const constants = require('../utilities/constants');
 
 const createToken = (_id) => {
     return jwt.sign({_id}, process.env.SECRET, { expiresIn: '1d' })
@@ -13,7 +13,7 @@ const loginUser = async (req, res) => {
     const {username, password} = req.body;
     console.log("Request Log : "+username,password);
     try { 
-        const query = 'SELECT * FROM public.users where username = $1 and password = $2';
+        const query = 'SELECT * FROM public.user where username = $1 and password = $2';
         const values = [username,password]
         console.log("Query Log : "+query); // Log the query
         const result = await pool.query(query,values);
@@ -21,11 +21,15 @@ const loginUser = async (req, res) => {
         if (result.rowCount > 0) {
             // create a token
             const token = createToken(result.rows[0].id);
-            const response = new LoginResponse(successCode,successMsg,token);
+            let data = {
+                username,
+                token
+            }
+            const response = new LoginResponse(data,constants.HTTP_RESPONSE.OK,constants.STATUS_MESSAGES.SUCCESS);
             res.status(200).json(response)
             
         } else {
-            const response = new LoginResponse(failureCode,"Invalid username or password!",null);
+            const response = new LoginResponse(data,constants.HTTP_RESPONSE.INAVALID_DATA,constants.STATUS_MESSAGES.FALIURE);
             res.status(200).json(response)
         }
     }
