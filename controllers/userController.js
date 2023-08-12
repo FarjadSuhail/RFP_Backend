@@ -13,7 +13,7 @@ const loginUser = async (req, res) => {
     const {username, password} = req.body;
     console.log("Request Log : "+username,password);
     try { 
-        const query = 'SELECT * FROM public.user where username = $1 and password = $2';
+        const query = 'SELECT * FROM public.users where username = $1 and password = $2';
         const values = [username,password]
         console.log("Query Log : "+query); // Log the query
         const result = await pool.query(query,values);
