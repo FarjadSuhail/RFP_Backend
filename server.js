@@ -1,6 +1,6 @@
 require('dotenv').config()
 const express = require('express');
-const pool = require('./config/db'); // Import the database connection
+const pool = require('./utilities/db'); // Import the database connection
 
 const userRoutes = require('./routes/user')
 
@@ -10,10 +10,10 @@ const app = express()
 // middleware
 app.use(express.json())
 
-app.use((req, res, next) => {
-  // console.log(req.path, req.method)
-  next()
-})
+// app.use((req, res, next) => {
+//   // console.log(req.path, req.method)
+//   next()
+// })
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -42,7 +42,18 @@ app.listen(PORT, () => {
 });
 
 
+const authenticateToken = (req, res, next) => {
+  const token = req.header('Authorization');
+  if (!token) return res.sendStatus(401);
 
+  jwt.verify(token, jwtSecret, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
+
+app.use(authenticateToken);
 
 
 

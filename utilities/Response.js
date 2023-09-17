@@ -1,4 +1,4 @@
-class LoginResponse{
+class Response{
     constructor(data, code, message) {
         this.data = data;
         this.statusCode = code;
@@ -7,5 +7,5 @@ class LoginResponse{
 }
 
 module.exports = {
-    LoginResponse
+    Response
 }
